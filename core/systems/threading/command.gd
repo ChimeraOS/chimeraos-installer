@@ -7,7 +7,7 @@ var thread_pool := load("res://core/systems/threading/thread_pool.tres") as Thre
 var cmd: String
 var args := PackedStringArray()
 var stdout: String
-var code := OK
+var code := 0
 var log_error := true
 var dry_run := true
 

@@ -42,18 +42,18 @@ func current_state() -> State:
 
 
 # Set state will set the entire state stack to the given array of states
-func set_state(stack: Array[State]) -> void:
+func set_state(states: Array[State]) -> void:
 	var cur := current_state()
 	var old_stack := _state_stack
-	_state_stack = stack
+	_state_stack = states
 	for s in old_stack:
 		var state := s as State
 		if has_state(state):
 			continue
 		state.state_removed.emit()
 	var changed_to: State = null
-	if stack.size() > 0:
-		changed_to = stack[-1]
+	if states.size() > 0:
+		changed_to = states[-1]
 	state_changed.emit(cur, changed_to)
 
 

@@ -116,7 +116,6 @@ func _start_repair(disk: Frzr.Disk) -> void:
 	frzr.repair_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
-		var err_msg := frzr.last_error
 		dialog.open("Failed to repair installation:\n" + frzr.last_error, "OK", "Cancel")
 		await dialog.choice_selected
 		next_button.grab_focus.call_deferred()

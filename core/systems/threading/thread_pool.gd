@@ -86,7 +86,7 @@ func exec(method: Callable) -> Variant:
 
 
 ## Each thread in the pool waits for tasks and executes methods from the queue
-func _process(id: int) -> void:
+func _process(_id: int) -> void:
 	while true:
 		semaphore.wait()
 		mutex.lock()
