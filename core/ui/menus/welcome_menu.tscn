@@ -1,0 +1,73 @@
+[gd_scene load_steps=9 format=3 uid="uid://dywkpevv6fxls"]
+
+[ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_pqka3"]
+[ext_resource type="Resource" uid="uid://c6711katx2omv" path="res://core/ui/menus/welcome_state.tres" id="2_w4hka"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="3_te6v0"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="4_6bcwb"]
+[ext_resource type="PackedScene" uid="uid://b76dvfuouhlwd" path="res://core/systems/state/state_updater.tscn" id="4_6d33o"]
+[ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="5_01v7f"]
+[ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="5_pi81i"]
+[ext_resource type="Resource" uid="uid://28g7drprieik" path="res://core/ui/menus/disk_select_state.tres" id="8_6ovu2"]
+
+[node name="WelcomeMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StateWatcher" parent="." instance=ExtResource("1_pqka3")]
+state = ExtResource("2_w4hka")
+
+[node name="FadeEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("3_te6v0")]
+target = NodePath("../..")
+on_signal = "state_entered"
+fade_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="SlideEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("4_6bcwb")]
+target = NodePath("../../Spacer")
+slide_speed = 0.4
+margin = 0
+on_signal = "state_entered"
+slide_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FocusGrabber" parent="StateWatcher/SlideEffect" node_paths=PackedStringArray("target") instance=ExtResource("5_01v7f")]
+target = NodePath("../../../Spacer/MarginContainer/VBoxContainer/Button")
+on_signal = "effect_finished"
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Spacer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Button" type="Button" parent="Spacer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Next"
+
+[node name="StateUpdater" parent="Spacer/MarginContainer/VBoxContainer/Button" instance=ExtResource("4_6d33o")]
+state_machine = ExtResource("5_pi81i")
+state = ExtResource("8_6ovu2")
+on_signal = "button_up"

@@ -1,0 +1,75 @@
+[gd_scene load_steps=10 format=3 uid="uid://dfuglyd5pdy3q"]
+
+[ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_6sdjg"]
+[ext_resource type="Resource" uid="uid://b2f3muqp1qeti" path="res://core/ui/menus/installer_options_state.tres" id="2_h1y7a"]
+[ext_resource type="PackedScene" uid="uid://b76dvfuouhlwd" path="res://core/systems/state/state_updater.tscn" id="2_q787m"]
+[ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="3_6gqye"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="3_7ae23"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="4_rr63w"]
+[ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="5_pxt1b"]
+[ext_resource type="Resource" uid="uid://cq5jf6fm6o6xk" path="res://core/ui/menus/default_install_state.tres" id="8_oq3st"]
+[ext_resource type="Resource" uid="uid://b4rj4l3fl2beh" path="res://core/ui/menus/advanced_install_state.tres" id="9_fbu50"]
+
+[node name="InstallerOptionsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StateWatcher" parent="." instance=ExtResource("1_6sdjg")]
+state = ExtResource("2_h1y7a")
+
+[node name="SlideEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("4_rr63w")]
+target = NodePath("../../Spacer")
+slide_speed = 0.4
+margin = 0
+on_signal = "state_entered"
+slide_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FadeEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("3_7ae23")]
+target = NodePath("../..")
+on_signal = "state_entered"
+fade_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FocusGrabber" parent="StateWatcher/FadeEffect" node_paths=PackedStringArray("target") instance=ExtResource("5_pxt1b")]
+target = NodePath("../../../Spacer/VBoxContainer/DefaultButton")
+on_signal = "effect_finished"
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="DefaultButton" type="Button" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+text = "Install ChimeraOS with default options"
+
+[node name="StateUpdater" parent="Spacer/VBoxContainer/DefaultButton" instance=ExtResource("2_q787m")]
+state_machine = ExtResource("3_6gqye")
+state = ExtResource("8_oq3st")
+on_signal = "button_up"
+
+[node name="AdvancedButton" type="Button" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+text = "Install ChimeraOS with advanced options"
+
+[node name="StateUpdater" parent="Spacer/VBoxContainer/AdvancedButton" instance=ExtResource("2_q787m")]
+state_machine = ExtResource("3_6gqye")
+state = ExtResource("9_fbu50")
+on_signal = "button_up"

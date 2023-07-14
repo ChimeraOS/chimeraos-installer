@@ -1,0 +1,7 @@
+# Godot 4+ specific ignores
+.godot/
+.cache/
+build
+dist
+videos
+settings.mk

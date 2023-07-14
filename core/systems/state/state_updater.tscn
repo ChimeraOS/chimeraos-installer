@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://b76dvfuouhlwd"]
+
+[ext_resource type="Script" path="res://core/systems/state/state_updater.gd" id="1_anggw"]
+
+[node name="StateUpdater" type="Node"]
+editor_description = "The StateUpdater can be added as a child to any node that exposes signals. 
+Upon entering the scene tree, the StateUpdater connects to a given signal on 
+its parent, and will update the configured state machine's state to the given
+state, allowing menus to react to state changes (e.g. changing menus)"
+script = ExtResource("1_anggw")
+on_signal = ""

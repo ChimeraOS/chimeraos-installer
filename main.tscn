@@ -1,0 +1,137 @@
+[gd_scene load_steps=17 format=3 uid="uid://bnqa2hj6mcr5g"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_0wpcj"]
+[ext_resource type="Theme" uid="uid://dmq3erfi6r4yd" path="res://assets/themes/chimera_theme.tres" id="1_14sjn"]
+[ext_resource type="Texture2D" uid="uid://dnywtgcvjgbg" path="res://assets/images/logo.svg" id="2_rvltf"]
+[ext_resource type="PackedScene" uid="uid://cl4f5no6oogd1" path="res://core/systems/input/input_watcher.tscn" id="3_5wnjd"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="3_ayd5a"]
+[ext_resource type="PackedScene" uid="uid://eqqk1uve143x" path="res://core/ui/components/dialog.tscn" id="4_er608"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="4_qhfyb"]
+[ext_resource type="PackedScene" uid="uid://b76dvfuouhlwd" path="res://core/systems/state/state_updater.tscn" id="5_qlmqs"]
+[ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="6_cb3tg"]
+[ext_resource type="Resource" uid="uid://c6711katx2omv" path="res://core/ui/menus/welcome_state.tres" id="7_dkb2b"]
+[ext_resource type="PackedScene" uid="uid://dywkpevv6fxls" path="res://core/ui/menus/welcome_menu.tscn" id="9_br3ec"]
+[ext_resource type="PackedScene" uid="uid://bv456bg77othn" path="res://core/ui/menus/network_menu.tscn" id="10_j6x6f"]
+[ext_resource type="PackedScene" uid="uid://bv2jbqgyaqii3" path="res://core/ui/menus/disk_select_menu.tscn" id="11_bjekc"]
+[ext_resource type="PackedScene" uid="uid://dfuglyd5pdy3q" path="res://core/ui/menus/installer_options_menu.tscn" id="11_cvfi2"]
+[ext_resource type="PackedScene" uid="uid://ck8pudkat23b8" path="res://core/ui/components/progress_dialog.tscn" id="14_jvved"]
+[ext_resource type="Script" path="res://core/systems/network/HTTPFileDownloader.gd" id="14_vytx7"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_14sjn")
+script = ExtResource("1_0wpcj")
+
+[node name="InputWatcher" parent="." instance=ExtResource("3_5wnjd")]
+action = "ui_cancel"
+
+[node name="StateUpdater" parent="InputWatcher" instance=ExtResource("5_qlmqs")]
+state_machine = ExtResource("6_cb3tg")
+action = 1
+on_signal = "input_released"
+
+[node name="LogoSlideEffect" parent="." node_paths=PackedStringArray("target") instance=ExtResource("4_qhfyb")]
+target = NodePath("../PanelContainer/MarginContainer/HBoxContainer/LogoContainer/Control/Logo")
+slide_speed = 1.0
+margin = -200
+on_signal = "ready"
+slide_out_signal = ""
+on_signal = "ready"
+
+[node name="LogoFadeInEffect" parent="." node_paths=PackedStringArray("target") instance=ExtResource("3_ayd5a")]
+target = NodePath("../PanelContainer/MarginContainer/HBoxContainer/LogoContainer/Control/Logo")
+fade_speed = 1.2
+on_signal = "ready"
+on_signal = "ready"
+
+[node name="ContentFadeEffect" parent="LogoFadeInEffect" node_paths=PackedStringArray("target") instance=ExtResource("3_ayd5a")]
+target = NodePath("../../PanelContainer/MarginContainer/HBoxContainer/ContentContainer")
+fade_speed = 0.7
+on_signal = "effect_finished"
+on_signal = "effect_finished"
+
+[node name="StateUpdater" parent="LogoFadeInEffect" instance=ExtResource("5_qlmqs")]
+state_machine = ExtResource("6_cb3tg")
+state = ExtResource("7_dkb2b")
+on_signal = "effect_finished"
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 60
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 60
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LogoContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer/LogoContainer"]
+layout_mode = 2
+
+[node name="Logo" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer/LogoContainer/Control"]
+layout_mode = 2
+offset_right = 378.0
+offset_bottom = 480.0
+size_flags_horizontal = 3
+texture = ExtResource("2_rvltf")
+stretch_mode = 5
+
+[node name="ContentContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="WelcomeMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("9_br3ec")]
+visible = false
+layout_mode = 2
+
+[node name="NetworkMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("10_j6x6f")]
+visible = false
+layout_mode = 2
+
+[node name="DiskSelectMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("11_bjekc")]
+visible = false
+layout_mode = 2
+
+[node name="InstallerOptionsMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("11_cvfi2")]
+visible = false
+layout_mode = 2
+
+[node name="Dialog" parent="." instance=ExtResource("4_er608")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="ProgressDialog" parent="." instance=ExtResource("14_jvved")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="HTTPFileDownloader" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("14_vytx7")

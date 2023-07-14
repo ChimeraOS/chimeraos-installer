@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3 uid="uid://cy0vf4kx6v4u2"]
+
+[ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_e0yq3"]
+[ext_resource type="Resource" uid="uid://cq5jf6fm6o6xk" path="res://core/ui/menus/default_install_state.tres" id="2_n5gcu"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="3_v6sft"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="4_yyy3t"]
+[ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="5_j57ew"]
+
+[node name="DefaultInstallMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StateWatcher" parent="." instance=ExtResource("1_e0yq3")]
+state = ExtResource("2_n5gcu")
+
+[node name="SlideEffect" parent="StateWatcher" instance=ExtResource("3_v6sft")]
+slide_speed = 0.4
+margin = 0
+on_signal = "state_entered"
+slide_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FadeEffect" parent="StateWatcher" instance=ExtResource("4_yyy3t")]
+on_signal = "state_entered"
+fade_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FocusGrabber" parent="StateWatcher/FadeEffect" instance=ExtResource("5_j57ew")]
+on_signal = "effect_finished"
