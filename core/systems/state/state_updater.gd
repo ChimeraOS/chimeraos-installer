@@ -43,6 +43,13 @@ func _on_signal():
 		ACTION.PUSH:
 			sm.push_state(state)
 		ACTION.POP:
+			# Only pop the stack when no dialogs are showing
+			var popups := get_tree().get_nodes_in_group("popup")
+			for popup in popups:
+				if (popup as Control).is_visible_in_tree():
+					return
+			
+			# Never pop the last item in the stack
 			if sm.stack_length() > 1:
 				sm.pop_state()
 		ACTION.REPLACE:

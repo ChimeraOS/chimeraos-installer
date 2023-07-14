@@ -51,7 +51,10 @@ func set_state(stack: Array[State]) -> void:
 		if has_state(state):
 			continue
 		state.state_removed.emit()
-	state_changed.emit(cur, stack[-1])
+	var changed_to: State = null
+	if stack.size() > 0:
+		changed_to = stack[-1]
+	state_changed.emit(cur, changed_to)
 
 
 # Push state will push the given state to the top of the state stack. 

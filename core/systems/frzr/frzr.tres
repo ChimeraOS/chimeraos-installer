@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Frzr" load_steps=2 format=3 uid="uid://h07gjfb4ixc"]
+
+[ext_resource type="Script" path="res://core/systems/frzr/frzr.gd" id="1_0i6ul"]
+
+[resource]
+script = ExtResource("1_0i6ul")

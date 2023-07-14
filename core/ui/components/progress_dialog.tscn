@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="2_dfcfn"]
 [ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="3_dexf2"]
 
-[node name="ProgressDialog" type="Control" groups=["progress_dialog"]]
+[node name="ProgressDialog" type="Control" groups=["popup", "progress_dialog"]]
 editor_description = "Opens a dialog choice to the user."
 layout_mode = 3
 anchors_preset = 8

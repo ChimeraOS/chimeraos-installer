@@ -2,6 +2,8 @@ extends Control
 
 const MOUNT_PATH := "/tmp/frzr_root"
 
+var frzr := load("res://core/systems/frzr/frzr.tres") as Frzr
+
 @onready var dialog := $%Dialog as Dialog
 @onready var progress_dialog := $%ProgressDialog as ProgressDialog
 @onready var http := $%HTTPFileDownloader as HTTPFileDownloader
@@ -27,7 +29,7 @@ func run():
 		get_tree().quit(1)
 		return
 
-	if Frzr.get_available_disks().size() == 0:
+	if frzr.get_available_disks().size() == 0:
 		var msg := "No available disks were detected. Unable to proceed with installation."
 		dialog.open(msg, "OK", "Cancel")
 		await dialog.choice_selected
