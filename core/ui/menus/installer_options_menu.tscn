@@ -58,7 +58,7 @@ alignment = 1
 
 [node name="DefaultButton" type="Button" parent="Spacer/VBoxContainer"]
 layout_mode = 2
-text = "Install ChimeraOS with default options"
+text = "Standard Install"
 
 [node name="StateUpdater" parent="Spacer/VBoxContainer/DefaultButton" instance=ExtResource("2_q787m")]
 state_machine = ExtResource("3_6gqye")
@@ -67,7 +67,7 @@ on_signal = "button_up"
 
 [node name="AdvancedButton" type="Button" parent="Spacer/VBoxContainer"]
 layout_mode = 2
-text = "Install ChimeraOS with advanced options"
+text = "Advanced Install"
 
 [node name="StateUpdater" parent="Spacer/VBoxContainer/AdvancedButton" instance=ExtResource("2_q787m")]
 state_machine = ExtResource("3_6gqye")

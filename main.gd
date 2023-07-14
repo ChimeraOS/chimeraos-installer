@@ -6,7 +6,6 @@ var frzr := load("res://core/systems/frzr/frzr.tres") as Frzr
 
 @onready var dialog := $%Dialog as Dialog
 @onready var progress_dialog := $%ProgressDialog as ProgressDialog
-@onready var http := $%HTTPFileDownloader as HTTPFileDownloader
 
 
 # Called when the node enters the scene tree for the first time.
@@ -23,7 +22,7 @@ func run():
 		var should_reboot := await dialog.choice_selected as bool
 		
 		if should_reboot:
-			#OS.execute("reboot", [])
+			OS.execute("reboot", [])
 			return
 		
 		get_tree().quit(1)
@@ -37,47 +36,25 @@ func run():
 		get_tree().quit(1)
 		return
 
-	## TEMP
-	return
 
-	#### Test conenction or ask the user for configuration ####
-
-	# Waiting a bit because some wifi chips are slow to scan 5GHZ networks
-	await get_tree().create_timer(2).timeout
-
-	#######################################
+## Handle back input events to exit the installer
+func _input(event: InputEvent) -> void:
+	if dialog.is_visible_in_tree() or progress_dialog.is_visible_in_tree():
+		return
+	if not event.is_action_pressed("ui_cancel"):
+		return
 	
-	#if OS.execute("frzr-bootstrap", ["gamer"]) != OK:
-	#	var msg := "System bootstrap step failed"
-	#	dialog.open(msg, "OK", "Cancel")
-	#	await dialog.choice_selected
-	#	get_tree().quit(1)
+	# Only ask to exit if at the top-level menu
+	var state_machine := load("res://core/ui/menus/global_state_machine.tres") as StateMachine
+	if state_machine.stack_length() > 1:
+		return
 
-	# Grab the steam bootstrap for first boot
-	var url := "https://steamdeck-packages.steamos.cloud/archlinux-mirror/jupiter-main/os/x86_64/steam-jupiter-stable-1.0.0.76-1-x86_64.pkg.tar.zst"
-	var tmp_pkg := "/tmp/package.pkg.tar.zst"
-	var tmp_file := "/tmp/bootstraplinux_ubuntu12_32.tar.xz"
-	var destination := "/tmp/frzr_root/etc/first-boot/"
-	if not DirAccess.dir_exists_absolute(destination):
-		DirAccess.make_dir_recursive_absolute(destination)
-
-	http.download_file = tmp_pkg
-	if http.request(url) != OK:
-		var msg := "Failed to download steam bootstrap"
-		dialog.open(msg, "Retry", "Cancel")
-		var should_retry := await dialog.choice_selected as bool
-
-	# Show a progress dialog for the download
-	progress_dialog.value = 0
-	progress_dialog.open("Downloading Steam bootstrap package")
-	var on_progress := func(percent: float):
-		progress_dialog.value = percent * 100
-	http.progressed.connect(on_progress)
-	var on_cancelled := func():
-		http.cancel_request()
-	progress_dialog.cancelled.connect(on_cancelled, CONNECT_ONE_SHOT)
-
-	await http.request_completed
-	http.progressed.disconnect(on_progress)
-	progress_dialog.close()
-	print("Download completed")
+	var msg := "Exit the ChimeraOS installer?"
+	dialog.open(msg, "No", "Yes")
+	var should_continue := await dialog.choice_selected as bool
+	
+	if not should_continue:
+		get_tree().quit(1)
+		return
+	var state := state_machine.pop_state()
+	state_machine.push_state(state)

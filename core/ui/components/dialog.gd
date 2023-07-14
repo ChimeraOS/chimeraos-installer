@@ -28,6 +28,11 @@ signal choice_selected(accepted: bool)
 		cancel_text = v
 		if cancel_button:
 			cancel_button.text = v
+@export var cancel_visible: bool = true:
+	set(v):
+		cancel_visible = v
+		if cancel_button:
+			cancel_button.visible = v
 ## Close the dialog when the user selects an option
 @export var close_on_selected := true
 

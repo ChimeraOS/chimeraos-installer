@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bv2jbqgyaqii3"]
+[gd_scene load_steps=8 format=3 uid="uid://bv2jbqgyaqii3"]
 
 [ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_2jsbv"]
 [ext_resource type="Script" path="res://core/ui/menus/disk_select_menu.gd" id="1_7ib43"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="3_2cngh"]
 [ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="4_eu6yu"]
 [ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="6_ijqax"]
+[ext_resource type="Script" path="res://core/systems/network/HTTPFileDownloader.gd" id="7_2ogx4"]
 
 [node name="DiskSelectMenu" type="Control"]
 layout_mode = 3
@@ -78,3 +79,7 @@ unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Next"
+
+[node name="HTTPFileDownloader" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("7_2ogx4")

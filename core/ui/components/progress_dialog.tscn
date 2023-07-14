@@ -15,6 +15,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_a1tu2")
+cancel_visible = null
 
 [node name="FadeEffect" parent="." node_paths=PackedStringArray("target") instance=ExtResource("2_dfcfn")]
 unique_name_in_owner = true

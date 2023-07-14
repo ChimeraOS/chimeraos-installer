@@ -7,6 +7,7 @@ signal repair_progressed(percent: float)
 
 const MOUNT_PATH := "/tmp/frzr_root"
 const USER := "gamer"
+const SYS_CONN_DIR := "/etc/NetworkManager/system-connections"
 
 enum ERROR {
 	OK = 0,
@@ -91,31 +92,31 @@ func repair_install(disk: Disk) -> ERROR:
 	var install_mount := partitions[1]
 	repair_progressed.emit(0.2)
 	
-	var mount_task := Task.new("mount", [install_mount, MOUNT_PATH])
+	var mount_task := Command.new("mount", [install_mount, MOUNT_PATH])
 	if await mount_task.execute() != OK:
 		return ERROR.PARTITIONING_FAILED
 	repair_progressed.emit(0.3)
 	
-	var mount_efi_task := Task.new("mount", ["-t", "vfat", boot_efi, MOUNT_PATH + "/boot/"])
+	var mount_efi_task := Command.new("mount", ["-t", "vfat", boot_efi, MOUNT_PATH + "/boot/"])
 	if await mount_efi_task.execute() != OK:
 		return ERROR.PARTITIONING_FAILED
 	repair_progressed.emit(0.4)
 
-	var clean_boot_task := Task.new("bash", ["-c", "rm -rf " + MOUNT_PATH + "/boot/*"])
+	var clean_boot_task := Command.new("bash", ["-c", "rm -rf " + MOUNT_PATH + "/boot/*"])
 	if await clean_boot_task.execute() != OK:
 		return ERROR.CLEANING_FAILED
 	repair_progressed.emit(0.5)
 
-	var bootctl_task := Task.new("bootctl", ["--esp-path=" + MOUNT_PATH + "/boot/", "install"])
+	var bootctl_task := Command.new("bootctl", ["--esp-path=" + MOUNT_PATH + "/boot/", "install"])
 	if await bootctl_task.execute() != OK:
 		return ERROR.PARTITIONING_FAILED
 	repair_progressed.emit(0.6)
 	
 	# Delete the subvolume
-	await Task.new("btrfs", ["subvolume", "delete", MOUNT_PATH + "/deployments/*"]).execute()
+	await Command.new("btrfs", ["subvolume", "delete", MOUNT_PATH + "/deployments/*"]).execute()
 	repair_progressed.emit(0.9)
 	
-	var clean_etc_task := Task.new("bash", ["-c", "rm -rf " + MOUNT_PATH + "/etc/*"])
+	var clean_etc_task := Command.new("bash", ["-c", "rm -rf " + MOUNT_PATH + "/etc/*"])
 	if await clean_etc_task.execute() != OK:
 		return ERROR.CLEANING_FAILED
 	repair_progressed.emit(1.0)
@@ -132,7 +133,7 @@ func bootstrap(to_disk: Disk) -> ERROR:
 	bootstrap_progressed.emit(0.1)
 	
 	# Create partition table
-	var parted_task := Task.new("parted")
+	var parted_task := Command.new("parted")
 	parted_task.args = [
 		"--script", to_disk.path,
 		"mklabel", "gpt",
@@ -153,25 +154,25 @@ func bootstrap(to_disk: Disk) -> ERROR:
 	var part1 := partitions[0]
 	var part2 := partitions[1]
 	
-	var mkbtrfs_task := Task.new("mkfs.btrfs", ["-L", "frzr_root", "-f", part2])
+	var mkbtrfs_task := Command.new("mkfs.btrfs", ["-L", "frzr_root", "-f", part2])
 	if await mkbtrfs_task.execute() != OK:
 		last_error = "Unable to create btrfs filesystem on " + part2
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.4)
 	
-	var mntbtrfs_task := Task.new("mount", ["-t", "btrfs", "-o", "nodatacow", part2, MOUNT_PATH])
+	var mntbtrfs_task := Command.new("mount", ["-t", "btrfs", "-o", "nodatacow", part2, MOUNT_PATH])
 	if await mntbtrfs_task.execute() != OK:
 		last_error = "Unable to mount " + part2 + " on " + MOUNT_PATH
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.6)
 	
-	var volume1_task := Task.new("btrfs", ["subvolume", "create", MOUNT_PATH + "/var"])
+	var volume1_task := Command.new("btrfs", ["subvolume", "create", MOUNT_PATH + "/var"])
 	if await volume1_task.execute() != OK:
 		last_error = "Unable to create subvolume at: " + MOUNT_PATH + "/var"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.7)
 
-	var volume2_task := Task.new("btrfs", ["subvolume", "create", MOUNT_PATH + "/home"])
+	var volume2_task := Command.new("btrfs", ["subvolume", "create", MOUNT_PATH + "/home"])
 	if await volume2_task.execute() != OK:
 		last_error = "Unable to create subvolume at: " + MOUNT_PATH + "/home"
 		return ERROR.PARTITIONING_FAILED
@@ -182,7 +183,7 @@ func bootstrap(to_disk: Disk) -> ERROR:
 		return ERROR.CANT_CREATE
 	bootstrap_progressed.emit(0.81)
 	
-	var chown_task := Task.new("chown", ["1000:1000", MOUNT_PATH + "/home/" + USER])
+	var chown_task := Command.new("chown", ["1000:1000", MOUNT_PATH + "/home/" + USER])
 	if await chown_task.execute() != OK:
 		last_error = "Unable to set permissions on user's home directory"
 		return ERROR.CANT_CREATE
@@ -204,37 +205,49 @@ func bootstrap(to_disk: Disk) -> ERROR:
 	bootstrap_progressed.emit(0.85)
 
 	# setup boot partition & install bootloader
-	var mkvfat_task := Task.new("mkfs.vfat", [part1])
+	var mkvfat_task := Command.new("mkfs.vfat", [part1])
 	if await mkvfat_task.execute() != OK:
 		last_error = "Unable to create partition for bootloader"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.88)
 	
-	var dosfs_task := Task.new("dosfslabel", [part1, "frzr_efi"])
+	var dosfs_task := Command.new("dosfslabel", [part1, "frzr_efi"])
 	if await dosfs_task.execute() != OK:
 		last_error = "Unable to create partition label for bootloader"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.90)
 
-	var mntvfat_task := Task.new("mount", ["-t", "vfat", part1, MOUNT_PATH + "/boot/"])
+	var mntvfat_task := Command.new("mount", ["-t", "vfat", part1, MOUNT_PATH + "/boot/"])
 	if await mntvfat_task.execute() != OK:
 		last_error = "Unable to mount boot partition"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.94)
 	
-	var bootctl_task := Task.new("bootctl", ["--esp-path=" + MOUNT_PATH + "/boot/", "install"])
+	var bootctl_task := Command.new("bootctl", ["--esp-path=" + MOUNT_PATH + "/boot/", "install"])
 	if await bootctl_task.execute() != OK:
 		last_error = "Unable to install boot loader"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(0.96)
 	
-	var boot_parted_task := Task.new("parted", [to_disk.path, "set", "1", "boot", "on"])
+	var boot_parted_task := Command.new("parted", [to_disk.path, "set", "1", "boot", "on"])
 	if await boot_parted_task.execute() != OK:
 		last_error = "Unable to configure boot loader"
 		return ERROR.PARTITIONING_FAILED
 	bootstrap_progressed.emit(1.0)
 	
 	return ERROR.OK
+
+
+# TODO: Implement this
+#SYS_CONN_DIR="/etc/NetworkManager/system-connections"
+#if [ -d ${SYS_CONN_DIR} ] && [ -n "$(ls -A ${SYS_CONN_DIR})" ]; then
+#    mkdir -p -m=700 ${MOUNT_PATH}${SYS_CONN_DIR}
+#    cp  ${SYS_CONN_DIR}/* \
+#        ${MOUNT_PATH}${SYS_CONN_DIR}/.
+#fi
+## Copy over all network configuration from the live session to the system
+func copy_network_config() -> Error:
+	return OK
 
 
 ## Simple container for holding information about a disk
@@ -244,38 +257,3 @@ class Disk:
 	var model: String
 	var size: String
 	var install_found: bool
-
-
-## Convienience class for executing OS commands in a thread
-class Task:
-	var cmd: String
-	var args := PackedStringArray()
-	var stdout: String
-	var code := OK
-	var log_error := true
-	var dry_run := true
-
-	func _init(command: String = "", arguments: PackedStringArray = []) -> void:
-		cmd = command
-		args = arguments
-
-	func execute() -> int:
-		var thread_pool := load("res://core/systems/threading/thread_pool.tres") as ThreadPool
-		thread_pool.start()
-		
-		# Dry run
-		if dry_run:
-			print("DRY RUN: ", cmd, " ", args)
-			var ret := await thread_pool.exec(OS.execute.bind("sleep", [0.3])) as int
-			code = ret
-			return OK
-		
-		var output := []
-		var ret := await thread_pool.exec(OS.execute.bind(cmd, args, output)) as int
-		code = ret
-		stdout = output[0]
-		
-		if log_error and code != OK:
-			push_error("Failed to execute task '", cmd, " ", args, "': ", stdout)
-		
-		return ret

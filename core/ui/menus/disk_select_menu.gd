@@ -6,6 +6,7 @@ var disks := frzr.get_available_disks()
 
 @onready var tree := $%Tree
 @onready var next_button := $%NextButton
+@onready var http := $%HTTPFileDownloader as HTTPFileDownloader
 
 
 # Called when the node enters the scene tree for the first time.
@@ -34,6 +35,7 @@ func _ready() -> void:
 		disk_item.set_metadata(0, disk)
 
 
+## Invoked when the Next button is pressed
 func _on_next_pressed() -> void:
 	var item := tree.get_selected() as TreeItem
 	if not item:
@@ -93,8 +95,10 @@ func _start_bootstrap(disk: Frzr.Disk) -> void:
 		return
 	
 	state_machine.set_state([])
+	_start_post_bootstrap()
 
 
+# Perform a repair
 func _start_repair(disk: Frzr.Disk) -> void:
 	print("Repairing install")
 	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
@@ -119,3 +123,51 @@ func _start_repair(disk: Frzr.Disk) -> void:
 		return
 	
 	state_machine.set_state([])
+	_start_post_bootstrap()
+
+
+# Perform the post-bootstrapping steps
+func _start_post_bootstrap() -> void:
+	# Get the dialog node
+	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
+	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
+	
+	# Copy over all network configuration from the live session to the system
+	await frzr.copy_network_config()
+	
+	# Grab the steam bootstrap for first boot
+	var url := "https://steamdeck-packages.steamos.cloud/archlinux-mirror/jupiter-main/os/x86_64/steam-jupiter-stable-1.0.0.76-1-x86_64.pkg.tar.zst"
+	var tmp_pkg := "/tmp/package.pkg.tar.zst"
+	var tmp_file := "/tmp/bootstraplinux_ubuntu12_32.tar.xz"
+	var destination := "/tmp/frzr_root/etc/first-boot/"
+	if not DirAccess.dir_exists_absolute(destination):
+		DirAccess.make_dir_recursive_absolute(destination)
+
+	http.download_file = tmp_pkg
+	if http.request(url) != OK:
+		var msg := "Failed to download steam bootstrap"
+		dialog.open(msg, "Retry", "Cancel")
+		var should_retry := await dialog.choice_selected as bool
+
+	# Show a progress dialog for the download
+	progress.value = 0
+	progress.open("Downloading Steam bootstrap package")
+	var on_progress := func(percent: float):
+		progress.value = percent * 100
+	http.progressed.connect(on_progress)
+	var on_cancelled := func():
+		http.cancel_request()
+	progress.cancelled.connect(on_cancelled, CONNECT_ONE_SHOT)
+
+	await http.request_completed
+	http.progressed.disconnect(on_progress)
+	progress.close()
+	print("Download completed")
+	
+	await Command.new("bash", ["-c", "tar -I zstd -xvf '" + tmp_pkg + "' usr/lib/steam/bootstraplinux_ubuntu12_32.tar.xz -O > '" + tmp_file + "'"])
+	await Command.new("mv", [tmp_file, destination]).execute()
+	await Command.new("rm", [tmp_pkg]).execute()
+
+	# Switch menus
+	var installer_options_state := load("res://core/ui/menus/installer_options_state.tres")
+	state_machine.set_state([installer_options_state])

@@ -131,6 +131,7 @@ layout_mode = 1
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
+cancel_visible = true
 
 [node name="HTTPFileDownloader" type="Node" parent="."]
 unique_name_in_owner = true
