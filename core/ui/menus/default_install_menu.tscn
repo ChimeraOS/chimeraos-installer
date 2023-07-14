@@ -17,17 +17,68 @@ grow_vertical = 2
 [node name="StateWatcher" parent="." instance=ExtResource("1_e0yq3")]
 state = ExtResource("2_n5gcu")
 
-[node name="SlideEffect" parent="StateWatcher" instance=ExtResource("3_v6sft")]
+[node name="SlideEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("3_v6sft")]
+target = NodePath("../../Spacer")
 slide_speed = 0.4
 margin = 0
 on_signal = "state_entered"
 slide_out_signal = "state_exited"
 on_signal = "state_entered"
 
-[node name="FadeEffect" parent="StateWatcher" instance=ExtResource("4_yyy3t")]
+[node name="FadeEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("4_yyy3t")]
+target = NodePath("../..")
 on_signal = "state_entered"
 fade_out_signal = "state_exited"
 on_signal = "state_entered"
 
-[node name="FocusGrabber" parent="StateWatcher/FadeEffect" instance=ExtResource("5_j57ew")]
+[node name="FocusGrabber" parent="StateWatcher/FadeEffect" node_paths=PackedStringArray("target") instance=ExtResource("5_j57ew")]
+target = NodePath("../../../Spacer/VBoxContainer/GridContainer/LocalButton")
 on_signal = "effect_finished"
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="Label" type="Label" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+text = "How would you like to install ChimeraOS?"
+
+[node name="GridContainer" type="GridContainer" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="LocalButton" type="Button" parent="Spacer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Local"
+
+[node name="Label" type="Label" parent="Spacer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Use local media for installation"
+
+[node name="OnlineButton" type="Button" parent="Spacer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Online"
+
+[node name="Label2" type="Label" parent="Spacer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fetch the latest stable image"

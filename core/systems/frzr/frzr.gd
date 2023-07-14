@@ -18,6 +18,7 @@ enum ERROR {
 }
 
 var last_error := ""
+var target := "stable"
 
 
 ## Return the available disks

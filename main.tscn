@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bnqa2hj6mcr5g"]
+[gd_scene load_steps=18 format=3 uid="uid://bnqa2hj6mcr5g"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_0wpcj"]
 [ext_resource type="Theme" uid="uid://dmq3erfi6r4yd" path="res://assets/themes/chimera_theme.tres" id="1_14sjn"]
@@ -14,8 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://bv456bg77othn" path="res://core/ui/menus/network_menu.tscn" id="10_j6x6f"]
 [ext_resource type="PackedScene" uid="uid://bv2jbqgyaqii3" path="res://core/ui/menus/disk_select_menu.tscn" id="11_bjekc"]
 [ext_resource type="PackedScene" uid="uid://dfuglyd5pdy3q" path="res://core/ui/menus/installer_options_menu.tscn" id="11_cvfi2"]
+[ext_resource type="PackedScene" uid="uid://xg7knkqfyxq2" path="res://core/ui/menus/advanced_install_menu.tscn" id="14_c47kf"]
 [ext_resource type="PackedScene" uid="uid://ck8pudkat23b8" path="res://core/ui/components/progress_dialog.tscn" id="14_jvved"]
-[ext_resource type="Script" path="res://core/systems/network/HTTPFileDownloader.gd" id="14_vytx7"]
+[ext_resource type="PackedScene" uid="uid://cy0vf4kx6v4u2" path="res://core/ui/menus/default_install_menu.tscn" id="15_ry28q"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -122,6 +123,14 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
+[node name="AdvancedInstallMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("14_c47kf")]
+visible = false
+layout_mode = 2
+
+[node name="DefaultInstallMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("15_ry28q")]
+visible = false
+layout_mode = 2
+
 [node name="Dialog" parent="." instance=ExtResource("4_er608")]
 unique_name_in_owner = true
 visible = false
@@ -131,8 +140,3 @@ layout_mode = 1
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-cancel_visible = true
-
-[node name="HTTPFileDownloader" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("14_vytx7")

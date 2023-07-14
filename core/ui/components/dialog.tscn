@@ -51,6 +51,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Spacer/CenterContainer"]
+custom_minimum_size = Vector2(450, 0)
 layout_mode = 2
 theme_type_variation = &"Dialog"
 
@@ -70,6 +71,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "This is a dialog message with some text in it"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="Spacer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2

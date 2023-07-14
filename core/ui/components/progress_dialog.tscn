@@ -15,7 +15,6 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_a1tu2")
-cancel_visible = null
 
 [node name="FadeEffect" parent="." node_paths=PackedStringArray("target") instance=ExtResource("2_dfcfn")]
 unique_name_in_owner = true
@@ -52,6 +51,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Spacer/CenterContainer"]
+custom_minimum_size = Vector2(450, 0)
 layout_mode = 2
 theme_type_variation = &"Dialog"
 
@@ -71,6 +71,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "This is a dialog message with some text in it"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="ProgressBar" type="ProgressBar" parent="Spacer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true

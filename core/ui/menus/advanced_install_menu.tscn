@@ -1,0 +1,79 @@
+[gd_scene load_steps=10 format=3 uid="uid://xg7knkqfyxq2"]
+
+[ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_651cs"]
+[ext_resource type="Script" path="res://core/ui/menus/advanced_install_menu.gd" id="1_hsmml"]
+[ext_resource type="Resource" uid="uid://b4rj4l3fl2beh" path="res://core/ui/menus/advanced_install_state.tres" id="2_8lqiv"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="3_7rjfe"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="4_1k3er"]
+[ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="5_0imys"]
+[ext_resource type="PackedScene" uid="uid://b76dvfuouhlwd" path="res://core/systems/state/state_updater.tscn" id="6_abspf"]
+[ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="7_jvirm"]
+[ext_resource type="Resource" uid="uid://cq5jf6fm6o6xk" path="res://core/ui/menus/default_install_state.tres" id="8_eeeac"]
+
+[node name="AdvancedInstallMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hsmml")
+
+[node name="StateWatcher" parent="." instance=ExtResource("1_651cs")]
+state = ExtResource("2_8lqiv")
+
+[node name="SlideEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("3_7rjfe")]
+target = NodePath("../../Spacer")
+slide_speed = 0.3
+margin = 0
+on_signal = "state_entered"
+slide_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FadeEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("4_1k3er")]
+target = NodePath("../..")
+on_signal = "state_entered"
+fade_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FocusGrabber" parent="StateWatcher/FadeEffect" node_paths=PackedStringArray("target") instance=ExtResource("5_0imys")]
+target = NodePath("../../../Spacer/VBoxContainer/FirmwareCheckBox")
+on_signal = "effect_finished"
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="FirmwareCheckBox" type="CheckBox" parent="Spacer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Use Firmware Overrides DSDT/EDID"
+
+[node name="UnstableCheckBox" type="CheckBox" parent="Spacer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unstable Builds"
+
+[node name="NextButton" type="Button" parent="Spacer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Next"
+
+[node name="StateUpdater" parent="Spacer/VBoxContainer/NextButton" instance=ExtResource("6_abspf")]
+state_machine = ExtResource("7_jvirm")
+state = ExtResource("8_eeeac")
+on_signal = "button_up"
