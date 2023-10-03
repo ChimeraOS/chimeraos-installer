@@ -1,6 +1,6 @@
 GODOT ?= /usr/bin/godot
-GODOT_VERSION ?= $(shell godot --version | cut -d'.' -f 1,2)
-GODOT_RELEASE ?= $(shell godot --version | cut -d'.' -f 3)
+GODOT_VERSION ?= $(shell godot --version | grep -o '[0-9].*[0-9]')
+GODOT_RELEASE ?= $(shell godot --version | rev | cut -d '.' -f2 | rev)
 GODOT_REVISION := $(GODOT_VERSION).$(GODOT_RELEASE)
 EXPORT_TEMPLATE := $(HOME)/.local/share/godot/export_templates/$(GODOT_REVISION)/linux_debug.x86_64
 EXPORT_TEMPLATE_URL ?= https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-$(GODOT_RELEASE)/Godot_v$(GODOT_VERSION)-$(GODOT_RELEASE)_export_templates.tpz
