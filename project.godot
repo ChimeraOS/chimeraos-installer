@@ -24,8 +24,10 @@ gdscript/warnings/redundant_await=0
 
 window/size/viewport_width=1280
 window/size/viewport_height=800
+window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=4
 
 [editor]
 
