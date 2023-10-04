@@ -35,7 +35,7 @@ func get_available_disks() -> Array[Disk]:
 		if not line.contains("disk"):
 			continue
 		var parts := line.split(" ", false, 3)
-		if parts[2] as int == 0:
+		if parts[2] == "0B":
 			continue
 		var disk := Disk.new()
 		disk.name = parts[0]
