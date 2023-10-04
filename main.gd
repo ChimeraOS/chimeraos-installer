@@ -29,7 +29,7 @@ func run():
 		return
 
 	if frzr.get_available_disks().size() == 0:
-		var msg := "No available disks were detected. Unable to proceed with installation."
+		var msg := "No available disks were detected. Unable to proceed with installation. If you have an Intel CPU please make sure to turn off RST in BIOS settings."
 		dialog.open(msg, "OK", "Cancel")
 		await dialog.choice_selected
 		
