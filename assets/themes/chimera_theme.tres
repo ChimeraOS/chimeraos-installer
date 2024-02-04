@@ -50,6 +50,7 @@ corner_radius_bottom_left = 5
 [resource]
 Button/styles/hover = SubResource("StyleBoxFlat_gs8jf")
 Button/styles/normal = SubResource("StyleBoxFlat_p3csy")
+Dialog/base_type = &"PanelContainer"
 Dialog/styles/panel = SubResource("StyleBoxFlat_xapbx")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_k1e5x")
 ProgressBar/styles/background = SubResource("StyleBoxFlat_v38kh")
